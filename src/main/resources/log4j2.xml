@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" strict="true" name="XMLConfigTest">
+    <Properties>
+        <Property name="LOG_PATTERN">%d{dd:MM:yyyy HH:mm:ss.SSS} %M --> %m%n</Property>
+        <Property name="basePath">Logs</Property>
+        <Property name="dateTimePattern">%d{yyyy-MM-dd-HH-mm-ss}</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+         Routing Appender to create separate files based on class name
+        <Routing name="RoutingAppender">
+            <Routes pattern="$${ctx:class}">
+                <Route>
+                    <File name="$${ctx:class}Appender" fileName="${basePath}/$${ctx:class}-${dateTimePattern}.log">
+                        <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n"/>
+                    </File>
+                </Route>
+            </Routes>
+        </Routing>
+
+        <!-- Rolling File Appender -->
+        <RollingFile name="RollingFileAppender" fileName="${basePath}/CombineLogFile.log"
+                     filePattern="${basePath}/application.%d{MM-dd-yy}.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <DefaultRolloverStrategy max="50"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+<!--        <Logger name="com.example.AreaDataValidation" level="info" additivity="false">-->
+<!--            <AppenderRef ref="RoutingAppender"/>-->
+<!--        </Logger>-->
+<!--        <Logger name="com.example.CompetitionDataValidation" level="info" additivity="false">-->
+<!--            <AppenderRef ref="RoutingAppender"/>-->
+<!--        </Logger>-->
+
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFileAppender"/>
+        </Root>
+    </Loggers>
+</Configuration>
