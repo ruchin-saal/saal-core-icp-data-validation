@@ -1,5 +1,7 @@
 package utilities;
 
+import network.Configuration;
+
 import java.io.IOException;
 
 public class Config {
@@ -52,8 +54,20 @@ public class Config {
     public static String catalogs_tranformed;
     public static String schemas_tranformed;
 
+    /*Postgresql Config Variables*/
+    public static String postgresqlHost;
+    public static String port;
+    public static String database;
+    public static String dbUsername;
+    public static String dbPassword;
+    // Table Names
+    public static String employeeTable;
+    public static String pg_schema_name;
+    public static String employee_Trino_Table;
+
 
     public static void setConfigs() throws IOException {
+        GlbVar.currentEnvironment = "dev";
         trino_host = LoadProperty.getProperty("env_host");
         trino_port = LoadProperty.getProperty("env_port");
         trino_username = LoadProperty.getProperty("env_username");
@@ -104,5 +118,13 @@ public class Config {
         compatibility_scores_table=LoadProperty.getProperty("compatibility_scores_table");
         catalogs_tranformed =LoadProperty.getProperty("catalogs_tranformed");
         schemas_tranformed =LoadProperty.getProperty("schemas_tranformed");
+        postgresqlHost = LoadProperty.getProperty("postgresql_host");
+        port = LoadProperty.getProperty("port");
+        database = LoadProperty.getProperty("database");
+        dbUsername = LoadProperty.getProperty("db_username");
+        dbPassword = LoadProperty.getProperty("db_password");
+        employeeTable = LoadProperty.getProperty("employee_table");
+        pg_schema_name = LoadProperty.getProperty("pg_schema_name");
+        employee_Trino_Table = LoadProperty.getProperty("employee_Trino_Table");
     }
 }

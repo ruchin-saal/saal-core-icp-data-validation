@@ -60,7 +60,7 @@ public class Configuration extends RestUtils {
         }
         //This option is true when running from Local. Change value below to run from local
         else {
-            GlbVar.currentEnvironment = "prod";
+            GlbVar.currentEnvironment = "dev";
             logger.info("Scripts are running on " + GlbVar.currentEnvironment+" environment");
         }
 
@@ -80,6 +80,9 @@ public class Configuration extends RestUtils {
         GlbVar.catalog_name = loadProperty.getValueFromPropertyFile(GlbVar.propertyPath, "catalog_name");
         GlbVar.schemas_name = loadProperty.getValueFromPropertyFile(GlbVar.propertyPath, "schemas_name");
         GlbVar.area_tablename = loadProperty.getValueFromPropertyFile(GlbVar.propertyPath, "area_tablename");
+        GlbVar.employee_Trino_Table = loadProperty.getValueFromPropertyFile(GlbVar.propertyPath, "employee_Trino_Table");
+
+
 
         GlbVar.match_advancestats_tablename = loadProperty.getValueFromPropertyFile(GlbVar.propertyPath, "match_advancestats_tablename");
         GlbVar.staticAdvanceCompetitionIDList = loadProperty.getValueFromPropertyFile(GlbVar.propertyPath, "teamAdvanceCompetitionIDList");

@@ -68,8 +68,6 @@ public class LoadProperty {
         Properties mainProperties = new Properties();
         FileInputStream file;
         String CurrentDirectory = System.getProperty("user.dir");
-
-//        String path = CurrentDirectory +"/config.properties";
         String path = GlbVar.workingDirectory + "/src/test/resources/Config/" + GlbVar.currentEnvironment + ".properties";
         file = new FileInputStream(path);
         mainProperties.load(file);

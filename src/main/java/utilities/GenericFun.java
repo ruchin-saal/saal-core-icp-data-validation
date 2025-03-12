@@ -302,4 +302,11 @@ public class GenericFun {
         }
         return extractedText;
     }
+
+    public static ArrayList<String> removeItemFromList(ArrayList<String> originalList, String removeListItemText) {
+        // Remove the specific item if it exists in the list
+        originalList.remove(removeListItemText);
+        // Return the updated list
+        return originalList;  // FIX: Removed incorrect originalList() call
+    }
 }

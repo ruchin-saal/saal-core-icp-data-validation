@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import static utilities.DataTypeConverter.convertPostgresToTrino;
 
 public class AssertHelpers {
     private static final Logger logger = LogManager.getLogger(AssertHelpers.class);
@@ -173,5 +174,28 @@ public class AssertHelpers {
     }
     public static void softAssertAll(){
         softAssert.assertAll();
+    }
+
+    public static void compareColumnNameAndDataTypeListElementWise(List<String> postgresList, List<String> trinoList) {
+        // Convert PostgreSQL output to Trino format
+        List<String> convertedPostgresList = convertPostgresToTrino(postgresList);
+
+        // Ensure lists have the same size before comparison
+        if (convertedPostgresList.size() != trinoList.size()) {
+            logger.error("❌ Lists are of different sizes! PostgreSQL: " + convertedPostgresList.size() + " Trino: " + trinoList.size());
+            Assertions.fail("List sizes do not match!");
+        }
+
+        // Element-wise comparison
+        for (int i = 0; i < convertedPostgresList.size(); i++) {
+            Assertions.assertTrue(convertedPostgresList.get(i).equals(trinoList.get(i)),
+                    "Mismatch at index " + i + ": Expected " + convertedPostgresList.get(i) + " but got " + trinoList.get(i));
+
+            if (convertedPostgresList.get(i).equals(trinoList.get(i))) {
+                logger.info(convertedPostgresList.get(i) + " ✅ MATCHED");
+            } else {
+                logger.info(convertedPostgresList.get(i) + " ❌ NOT MATCHED");
+            }
+        }
     }
 }

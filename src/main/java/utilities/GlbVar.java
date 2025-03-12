@@ -23,6 +23,7 @@ public class GlbVar {
     public static String competition_tablename;
     public static String areaList;
 
+    public static String employee_Trino_Table;
     public static String match_advancestats_tablename;
     public static String staticAdvanceCompetitionIDList;
     public static String teamAdvanceCompetitionIDSize;
