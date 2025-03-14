@@ -309,4 +309,9 @@ public class GenericFun {
         // Return the updated list
         return originalList;  // FIX: Removed incorrect originalList() call
     }
+
+    public static String removeTextFromString(String input, String removeText) {
+        return input.replace(removeText, ""); // Remove brackets
+    }
+
 }

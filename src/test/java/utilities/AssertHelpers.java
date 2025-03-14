@@ -68,27 +68,12 @@ public class AssertHelpers {
         Collections.sort(apiList);
         Collections.sort(dbList);
 
-
             if (!apiList.equals(dbList)) {
                 logger.info("Assertion Failed due to Data Mismatch \n\n\n\n\nAPI DATA: \n" + apiList + "\n\n\n\n\nDB data: " + dbList + "\n\n\n\n\n number of records in API column is: " + apiList.size() + " number of records in DB is: " + dbList.size());
 
         }
         Assertions.assertTrue(apiList.equals(dbList));
 
-
-
-//
-//        for (int i = 0; i < dbList.size(); i++) {
-//            if (!apiList.get(i).equals(dbList.get(i))) {
-//                logger.info("Data Mismatch \nAPI DATA: " + apiList.get(i).toString() + "\nDB data: " + dbList.get(i).toString() + "\n number of records in API column is: " + apiList.size() + " number of records in DB is: " + dbList.size());
-//            }
-//        }
-//
-//        for (int i = 0; i < dbList.size(); i++) {
-//            softAssert.assertTrue(apiList.get(i).equals(dbList.get(i)),
-//                    "\nAPI data: " + apiList.get(i) + " is not matching with \nDB data: "
-//                            + dbList.get(i) + " number of records in API column is: " + apiList.size() + " number of records in DB is: " + dbList.size());
-//        }
     }
 
     public static void softAssertTrueToCheckDuplicateValue(List dbValue){
@@ -177,25 +162,67 @@ public class AssertHelpers {
     }
 
     public static void compareColumnNameAndDataTypeListElementWise(List<String> postgresList, List<String> trinoList) {
+        SoftAssertions softAssert = new SoftAssertions();
+
         // Convert PostgreSQL output to Trino format
         List<String> convertedPostgresList = convertPostgresToTrino(postgresList);
 
         // Ensure lists have the same size before comparison
         if (convertedPostgresList.size() != trinoList.size()) {
             logger.error("❌ Lists are of different sizes! PostgreSQL: " + convertedPostgresList.size() + " Trino: " + trinoList.size());
-            Assertions.fail("List sizes do not match!");
+            softAssert.fail("List sizes do not match! PostgreSQL: " + convertedPostgresList.size() + " Trino: " + trinoList.size());
         }
 
         // Element-wise comparison
         for (int i = 0; i < convertedPostgresList.size(); i++) {
-            Assertions.assertTrue(convertedPostgresList.get(i).equals(trinoList.get(i)),
-                    "Mismatch at index " + i + ": Expected " + convertedPostgresList.get(i) + " but got " + trinoList.get(i));
+            String expected = convertedPostgresList.get(i);
+            String actual = trinoList.get(i);
 
-            if (convertedPostgresList.get(i).equals(trinoList.get(i))) {
-                logger.info(convertedPostgresList.get(i) + " ✅ MATCHED");
+            softAssert.assertThat(actual)
+                    .as("Mismatch at index " + i)
+                    .isEqualTo(expected);
+
+            if (expected.equals(actual)) {
+                logger.info(expected + " ✅ MATCHED");
             } else {
-                logger.info(convertedPostgresList.get(i) + " ❌ NOT MATCHED");
+                logger.info(expected + " ❌ NOT MATCHED");
             }
         }
+
+        // Run all assertions at the end
+        softAssert.assertAll();
     }
+
+    public static void assertTrue(int list1, int list2){
+        Assertions.assertEquals(list1, list2,
+                "Failed as PostgreSQL value is: "+list1+ " while Trino value is: "+list2);
+    }
+
+    public static void assertTrue(int value){
+        Assertions.assertTrue(value==0, "Having duplicate rows and count is: "+value);
+    }
+
+    public static void assertTrueSoft(int value) {
+        softAssert.assertThat(value)
+                .as("Checking duplicate rows count")
+                .isEqualTo(0);
+        if(value==0){
+            logger.info("ASSERTION PASSED");
+        }else {
+            logger.info("ASSERTION FAILED::"+" Looking for 0 while got "+value);
+        }
+    }
+
+    public static void validateNumberOfRecords(int list1, int list2) {
+        softAssert.assertThat(list1)
+                .as("Failed as PostgreSQL value is: " + list1 + " while Trino value is: " + list2)
+                .isEqualTo(list2);
+        if(list1==list2){
+            logger.info("ASSERTION PASSED");
+        }else {
+            logger.info("ASSERTION FAILED::"+" PostgreSQL is having "+list1+" records while Trino is having "+list2+" records");
+        }
+
+    }
+
 }

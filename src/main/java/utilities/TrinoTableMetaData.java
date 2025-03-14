@@ -556,4 +556,140 @@ public class TrinoTableMetaData {
         }
         return columnRecords;
     }
+
+    public static int fetchNumberOfRecords() throws SQLException {
+        TrinoConnection trinoConnection = new TrinoConnection();
+        Connection connection = trinoConnection.connect_trino(Config.catalog_name);
+        connection.setAutoCommit(true);
+
+        String sqlQuery = String.format(
+                "SELECT COUNT(*) FROM %s.%s.%s",
+                Config.catalog_name, Config.schemas_name, Config.employee_Trino_Table
+        );
+        logger.info("TRINO SQL:: " + sqlQuery);
+
+        // Execute the query
+        TrinoResultSet resultSet = (TrinoResultSet) trinoConnection.executeSelectQuery(sqlQuery);
+
+        int rowCount = 0;
+        if (resultSet != null && resultSet.next()) {
+            rowCount = resultSet.getInt(1); // Fetch count
+        } else {
+            System.out.println("ResultSet is null or empty. Query execution failed.");
+        }
+
+        // Close resultSet and connection
+        if (resultSet != null) {
+            resultSet.close();
+        }
+        if (connection != null) {
+            connection.close();
+        }
+        return rowCount; // Return the count of rows
+    }
+
+    public static ArrayList<String> fetchColumnNames() throws SQLException {
+        TrinoConnection trinoConnection = new TrinoConnection();
+        Connection connection = trinoConnection.connect_trino(Config.catalog_name);
+        connection.setAutoCommit(true);
+        TrinoResultSet resultSet = null;
+
+        String sqlQuery = String.format(
+                "SELECT column_name FROM %s.information_schema.columns WHERE table_schema = '%s' AND table_name = '%s' ORDER BY column_name",
+                Config.catalog_name, Config.schemas_name, Config.employee_Trino_Table
+        );
+
+//        logger.info("TRINO SQL FOR GETTING COLUMN NAAMES OF TABLE:: " + sqlQuery);
+        // Execute the query
+        resultSet = (TrinoResultSet) trinoConnection.executeSelectQuery(sqlQuery);
+
+        ArrayList<String> columnNames = new ArrayList<>();
+        if (resultSet != null) {
+            while (resultSet.next()) {
+                String columnName = resultSet.getString(1); // Fetch only column name
+                columnNames.add(columnName);  // Store only column name
+            }
+        } else {
+            System.out.println("ResultSet is null. Query execution failed.");
+        }
+
+        // Close resultSet and connection
+        if (resultSet != null) {
+            resultSet.close();
+        }
+        if (connection != null) {
+            connection.close();
+        }
+        return columnNames;
+    }
+
+    public static ArrayList<String> duplicateRecords(String columnNames) throws SQLException {
+        TrinoConnection trinoConnection = new TrinoConnection();
+        Connection connection = trinoConnection.connect_trino(Config.catalog_name);
+        connection.setAutoCommit(true);
+        TrinoResultSet resultSet = null;
+
+        // Ensure columnNames is valid
+        if (columnNames == null || columnNames.trim().isEmpty()) {
+            throw new IllegalArgumentException("Column names cannot be null or empty");
+        }
+
+        // Construct SQL query to find duplicate records
+        String sqlQuery = String.format(
+                "SELECT %s, COUNT(*) AS duplicate_count " +
+                        "FROM %s.%s.%s " +
+                        "GROUP BY %s " +
+                        "HAVING COUNT(*) > 1",
+                columnNames, Config.catalog_name, Config.schemas_name, Config.employee_Trino_Table, columnNames
+        );
+
+        logger.info("<<<<<TRINO SQL FOR DUPLICATE RECORDS>>>>>" + sqlQuery);
+
+        // Execute the query
+        resultSet = (TrinoResultSet) trinoConnection.executeSelectQuery(sqlQuery);
+        ArrayList<String> duplicateRecords = new ArrayList<>();
+        if (resultSet != null) {
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount(); // Get number of columns in result
+
+            while (resultSet.next()) {
+                StringBuilder rowRecord = new StringBuilder();
+
+                // Loop through all columns dynamically
+                for (int i = 1; i <= columnCount; i++) {
+                    rowRecord.append(metaData.getColumnName(i)) // Column Name
+                            .append(": ")
+                            .append(resultSet.getString(i)) // Column Value
+                            .append(" | ");
+                }
+
+                // Remove last " | " separator
+                if (rowRecord.length() > 3) {
+                    rowRecord.setLength(rowRecord.length() - 3);
+                }
+
+                // Print the full row
+//                logger.info(rowRecord.toString());
+
+                // Store the full row record in the list
+                duplicateRecords.add(rowRecord.toString());
+            }
+        } else {
+            logger.info("ResultSet is null. Query execution failed.");
+        }
+
+        // Close resultSet and connection
+        if (resultSet != null) {
+            resultSet.close();
+        }
+        if (connection != null) {
+            connection.close();
+        }
+        return duplicateRecords;
+    }
+
+
+
+
+
 }
