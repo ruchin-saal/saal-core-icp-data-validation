@@ -1,7 +1,5 @@
 package utilities;
 
-import network.Configuration;
-
 import java.io.IOException;
 
 public class Config {
@@ -61,9 +59,9 @@ public class Config {
     public static String dbUsername;
     public static String dbPassword;
     // Table Names
-    public static String employeeTable;
+    public static String oracle_TableNames;
     public static String pg_schema_name;
-    public static String employee_Trino_Table;
+    public static String trino_TableNames;
 
 
     public static void setConfigs() throws IOException {
@@ -123,8 +121,8 @@ public class Config {
         database = LoadProperty.getProperty("database");
         dbUsername = LoadProperty.getProperty("db_username");
         dbPassword = LoadProperty.getProperty("db_password");
-        employeeTable = LoadProperty.getProperty("employee_table");
+        oracle_TableNames = LoadProperty.getProperty("oracle_TableNames");
         pg_schema_name = LoadProperty.getProperty("pg_schema_name");
-        employee_Trino_Table = LoadProperty.getProperty("employee_Trino_Table");
+        trino_TableNames = LoadProperty.getProperty("trino_TableNames");
     }
 }

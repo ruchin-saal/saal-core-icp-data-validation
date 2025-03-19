@@ -2,6 +2,7 @@ package utilities;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -9,7 +10,7 @@ import java.util.*;
 public class GenericFun {
     private static final Logger logger = LogManager.getLogger(GenericFun.class);
 
-    public static void  setDesignTemplate() {
+    public static void setDesignTemplate() {
         System.out.println("\n#############################################################\n#" +
                 "                                                           #");
         System.out.println("#        Welcome to World of Qa Automation Testing          #\n#" +
@@ -19,43 +20,44 @@ public class GenericFun {
 
 
     public static void printStatement(String value) {
-        System.out.println("The Value is below \n"+value);
+        System.out.println("The Value is below \n" + value);
     }
 
 
-    public static HashMap<String,String> getCurrentDate(){
-        HashMap<String,String> hashMap = new HashMap<>();
+    public static HashMap<String, String> getCurrentDate() {
+        HashMap<String, String> hashMap = new HashMap<>();
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         System.out.println(dateFormat.format(date));
-        hashMap.put("day",dateFormat.format(date).split("-")[2]);
-        hashMap.put("month",dateFormat.format(date).split("-")[1]);
+        hashMap.put("day", dateFormat.format(date).split("-")[2]);
+        hashMap.put("month", dateFormat.format(date).split("-")[1]);
         return hashMap;
     }
 
-    public static String getCurrentDay(){
+    public static String getCurrentDay() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date date = new Date();
         System.out.println(dateFormat.format(date));
         return dateFormat.format(date);
     }
-    public static String getTimeStamp(){
+
+    public static String getTimeStamp() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date date = new Date();
         System.out.println(dateFormat.format(date));
         return dateFormat.format(date);
     }
 
-    public static String getCurrentTimeInUTCFormat(){
+    public static String getCurrentTimeInUTCFormat() {
         SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         f.setTimeZone(TimeZone.getTimeZone("UTC"));
         return f.format(new Date());
     }
 
-    public static ArrayList<String> createArrayListUsingAPIData(int size, String responseValue){
+    public static ArrayList<String> createArrayListUsingAPIData(int size, String responseValue) {
         ArrayList<String> uniqueList = new ArrayList<>();
         HashSet<String> uniqueSet = new HashSet<>();
-        for (int i=0;i<size;i++) {
+        for (int i = 0; i < size; i++) {
             uniqueSet.add(responseValue);
         }
         uniqueList.addAll(uniqueSet);
@@ -63,19 +65,18 @@ public class GenericFun {
         return uniqueList;
     }
 
-    public static ArrayList<String> createGradesListUsingExcelData(String sheetName, int startColumnIndex, int endColumnIndex){
+    public static ArrayList<String> createGradesListUsingExcelData(String sheetName, int startColumnIndex, int endColumnIndex) {
         ArrayList<String> excelList = new ArrayList<String>();
-        for(int i=startColumnIndex;i<endColumnIndex;i++){
-            String cellValue = Xlsx_Reader.getCellDataByColumnIndex(sheetName,1,i);
+        for (int i = startColumnIndex; i < endColumnIndex; i++) {
+            String cellValue = Xlsx_Reader.getCellDataByColumnIndex(sheetName, 1, i);
             excelList.add(cellValue);
         }
         ArrayList<String> finalExcelList = new ArrayList<>();
         for (String element : excelList) {
-            if(element.contains(" ")){
+            if (element.contains(" ")) {
                 String[] parts = element.split(" ");
                 finalExcelList.add(parts[1]);
-            }
-            else{
+            } else {
                 finalExcelList.add(element);
             }
         }
@@ -127,8 +128,9 @@ public class GenericFun {
                 apIUnmatchedElements.add(element);
             }
         }
-        if (!apIUnmatchedElements.isEmpty())
-        { logger.info("Subject not present in excel: "+apIUnmatchedElements);}
+        if (!apIUnmatchedElements.isEmpty()) {
+            logger.info("Subject not present in excel: " + apIUnmatchedElements);
+        }
         return apIUnmatchedElements;
     }
 
@@ -151,20 +153,22 @@ public class GenericFun {
                 excelUnmatchedElements.add(element);
             }
         }
-        if (!excelUnmatchedElements.isEmpty())
-        { logger.info("Subject not present in API: "+excelUnmatchedElements);}
+        if (!excelUnmatchedElements.isEmpty()) {
+            logger.info("Subject not present in API: " + excelUnmatchedElements);
+        }
         return excelUnmatchedElements;
     }
 
-    public static ArrayList<String> createListUsingExcelData(String sheetName, int startColumnIndex, int rowNumber){
+    public static ArrayList<String> createListUsingExcelData(String sheetName, int startColumnIndex, int rowNumber) {
         ArrayList<String> excelList = new ArrayList<String>();
-        for(int i=startColumnIndex;i<Xlsx_Reader.getRowCount(sheetName);i++){
-            String cellValue = Xlsx_Reader.getCellDataByColumnIndex(sheetName,rowNumber,i);
-            i=i+2;
-            if (!cellValue.isEmpty()){
-            excelList.add(cellValue);
+        for (int i = startColumnIndex; i < Xlsx_Reader.getRowCount(sheetName); i++) {
+            String cellValue = Xlsx_Reader.getCellDataByColumnIndex(sheetName, rowNumber, i);
+            i = i + 2;
+            if (!cellValue.isEmpty()) {
+                excelList.add(cellValue);
+            } else {
+                break;
             }
-            else {break;}
         }
         return excelList;
     }
@@ -173,7 +177,7 @@ public class GenericFun {
         ArrayList<String> excelList = new ArrayList<String>();
         for (int i = rowNum; i < Xlsx_Reader.getRowCount(sheetName); i++) {
             String cellValue = Xlsx_Reader.getCellData(sheetName, i, columnIndex);
-            if (!cellValue.isEmpty()){
+            if (!cellValue.isEmpty()) {
                 excelList.add(cellValue);
             }
         }
@@ -183,39 +187,39 @@ public class GenericFun {
     public static List<String> createSubListUsingExcelData(String sheetName, int startColumnIndex, int rowNumber) {
         ArrayList<String> excelList = new ArrayList<String>();
         String subCellValue = Xlsx_Reader.getCellDataByColumnIndex(sheetName, rowNumber, startColumnIndex);
-        String classCellValue=Xlsx_Reader.getCellDataByColumnIndex(sheetName,rowNumber,startColumnIndex+2);
-        String gradeCellValue = Xlsx_Reader.getCellData(sheetName,rowNumber,startColumnIndex+1);
+        String classCellValue = Xlsx_Reader.getCellDataByColumnIndex(sheetName, rowNumber, startColumnIndex + 2);
+        String gradeCellValue = Xlsx_Reader.getCellData(sheetName, rowNumber, startColumnIndex + 1);
         String[] grades = gradeCellValue.split(" ");
-        String grade=grades[1];
+        String grade = grades[1];
 
         List<String> classList = new ArrayList<>();
         for (int i = 0; i < classCellValue.length(); i++) {
-           String element = String.valueOf(classCellValue.charAt(i));
-           classList.add("G"+grade+"-"+element);
+            String element = String.valueOf(classCellValue.charAt(i));
+            classList.add("G" + grade + "-" + element);
         }
         return classList;
     }
 
-    public static List<String> createStringListUsingLetters(String inputString){
+    public static List<String> createStringListUsingLetters(String inputString) {
         List<String> lettersList = new ArrayList<>();
         for (int i = 0; i < inputString.length(); i++) {
             lettersList.add(String.valueOf(inputString.charAt(i)));
         }
-      return lettersList;
+        return lettersList;
     }
 
-    public static List<String> getUniqueList(List<String> list){
+    public static List<String> getUniqueList(List<String> list) {
         Set<String> setWithoutDuplicates = new HashSet<>(list);
         List<String> listWithoutDuplicates = new ArrayList<>(setWithoutDuplicates);
         return listWithoutDuplicates;
     }
 
-    public static String replaceAnyValue(String originalText, String textToReplace, String replaceWith){
-        originalText=originalText.replace(textToReplace, replaceWith);
+    public static String replaceAnyValue(String originalText, String textToReplace, String replaceWith) {
+        originalText = originalText.replace(textToReplace, replaceWith);
         return originalText;
     }
 
-    public static ArrayList<String> listStringToDecimalConversion(List<String> stringList){
+    public static ArrayList<String> listStringToDecimalConversion(List<String> stringList) {
         ArrayList<Double> decimalList = new ArrayList<>();
         for (String value : stringList) {
             decimalList.add(Double.parseDouble(value));
@@ -228,13 +232,13 @@ public class GenericFun {
     }
 
 
-    public static ArrayList<String> removeDuplicateDataFromList(List<String> originalData){
+    public static ArrayList<String> removeDuplicateDataFromList(List<String> originalData) {
         Set<String> db_competitionIdRemoveDuplicate = new HashSet<>(originalData);
-        ArrayList<String>duplicateRemoved=new ArrayList<String>(db_competitionIdRemoveDuplicate);
+        ArrayList<String> duplicateRemoved = new ArrayList<String>(db_competitionIdRemoveDuplicate);
         return duplicateRemoved;
     }
 
-    public static ArrayList<String> removeZeroFromList(List<String> originalData){
+    public static ArrayList<String> removeZeroFromList(List<String> originalData) {
         originalData.removeIf(item -> item == "0");
         originalData.removeIf(item -> item.equals("0"));
         originalData.removeIf(item -> item == String.valueOf(0));
@@ -242,8 +246,8 @@ public class GenericFun {
     }
 
 
-    public static ArrayList<String> changeDateFormat(ArrayList<String> inputDate){
-        ArrayList<String> updatedList=new ArrayList<>();
+    public static ArrayList<String> changeDateFormat(ArrayList<String> inputDate) {
+        ArrayList<String> updatedList = new ArrayList<>();
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -296,7 +300,7 @@ public class GenericFun {
         String[] parts = originalValue.split(replacedValue);
 
         // Check if the split was successful and print the value after "teamID>>"
-        String extractedText="";
+        String extractedText = "";
         if (parts.length > 1) {
             extractedText = parts[1];
         }
@@ -312,6 +316,56 @@ public class GenericFun {
 
     public static String removeTextFromString(String input, String removeText) {
         return input.replace(removeText, ""); // Remove brackets
+    }
+
+    public static Object getTrinoTableDetails(String input, String category) {
+        // Validate input
+        if (input == null || input.isEmpty() || !input.contains(".")) {
+            throw new IllegalArgumentException("Invalid input format. Expected format: catalog.schema.table");
+        }
+
+        // Split by "." to extract catalog, schema, and table
+        String[] parts = input.split("\\.");
+
+        // Ensure there are exactly 3 parts
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid input format. Expected format: catalog.schema.table");
+        }
+        // Determine which part to return
+        switch (category.toLowerCase()) {
+            case "catalog":
+                return parts[0];
+            case "schema":
+                return parts[1];
+            case "table":
+                return parts[2];
+            default:
+                throw new IllegalArgumentException("Invalid category. Expected 'catalog', 'schema', or 'table'.");
+        }
+    }
+
+    public static Object getPostgreSQLTableDetails(String input, String category) {
+        // Validate input
+        if (input == null || input.isEmpty() || !input.contains(".")) {
+            throw new IllegalArgumentException("Invalid input format. Expected format: schema.table");
+        }
+
+        // Split by "." to extract catalog, schema, and table
+        String[] parts = input.split("\\.");
+
+        // Ensure there are exactly 3 parts
+        if (parts.length != 2) {
+            throw new IllegalArgumentException("Invalid input format. Expected format: schema.table");
+        }
+        // Determine which part to return
+        switch (category.toLowerCase()) {
+            case "schema":
+                return parts[0];
+            case "table":
+                return parts[1];
+            default:
+                throw new IllegalArgumentException("Invalid category. 'schema', and 'table'.");
+        }
     }
 
 }
