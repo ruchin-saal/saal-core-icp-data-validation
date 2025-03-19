@@ -74,24 +74,6 @@ public class PostgreSQLConnection {
         }
     }
 
-    /**
-     * Calls all methods in sequence to connect, execute query, and close the connection.
-     * Returns the query result as a List<String>.
-     */
-    public List<String> runDatabaseOperations() {
-        List<String> queryResult = new ArrayList<>();
-        String sql = "SELECT * FROM " + Config.pg_schema_name + "." + Config.oracle_TableNames + " LIMIT 10;";
-        try {
-            connect();               // Step 1: Establish Connection
-            queryResult = executeQuery(sql);  // Step 2: Execute Query
-        } catch (Exception e) {
-            System.err.println("❌ An error occurred: " + e.getMessage());
-        } finally {
-            closeConnection(); // Step 3: Close Connection
-        }
-        return queryResult;
-    }
-
     public List<String> fetchColumnNamesAndDataType(String postgreSQLTableDetails) {
         List<String> queryResult = new ArrayList<>();
         String schemaName = (String) GenericFun.getPostgreSQLTableDetails(postgreSQLTableDetails, "schema");

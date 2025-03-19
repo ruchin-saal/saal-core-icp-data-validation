@@ -51,6 +51,7 @@ public class Config {
     public static String compatibility_scores_table;
     public static String catalogs_tranformed;
     public static String schemas_tranformed;
+    public static String  limit;
 
     /*Postgresql Config Variables*/
     public static String postgresqlHost;
@@ -124,5 +125,6 @@ public class Config {
         oracle_TableNames = LoadProperty.getProperty("oracle_TableNames");
         pg_schema_name = LoadProperty.getProperty("pg_schema_name");
         trino_TableNames = LoadProperty.getProperty("trino_TableNames");
+        limit = LoadProperty.getProperty("limit");
     }
 }

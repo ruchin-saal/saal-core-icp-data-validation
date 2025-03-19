@@ -490,40 +490,6 @@ public class TrinoTableMetaData {
         return columnRecords;
     }
 
-    public static ArrayList<String> getTableMetaDataByTableName() throws SQLException {
-        //Connecting Trino to execute queries
-        TrinoConnection trinoConnection = new TrinoConnection();
-        Connection connection = trinoConnection.connect_trino(Config.catalog_name);
-        connection.setAutoCommit(true);
-        TrinoResultSet resultSet = null;
-        String sqlQuery = "SHOW COLUMNS FROM " + Config.catalog_name + "." + Config.schemas_name + "." + Config.catalog_name;
-        resultSet = (TrinoResultSet) trinoConnection.executeSelectQuery(sqlQuery);
-        // Check if resultSet is not null (query execution successful)
-        ArrayList<String> sortedMetaData = new ArrayList<>();
-        if (resultSet != null) {
-            // Get metadata to fetch column names
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            // Print column names
-            ArrayList<String> columnName = new ArrayList<>();
-            // Print query results
-            while (resultSet.next()) {
-                for (int i = 1; i <= 1; i++) {
-                    columnName.add(resultSet.getString(i));
-                }
-            }
-            for (int i = 0; i < columnName.size() - 2; i++) {
-                sortedMetaData.add(columnName.get(i));
-            }
-//            Collections.sort(sortedMetaData);
-        } else {
-            System.out.println("ResultSet is null. Query execution failed.");
-        }
-        resultSet.close();
-        connection.close();
-        return sortedMetaData;
-    }
-
     public static ArrayList<String> fetchColumnNamesAndDataType(String trinoTableName) throws SQLException {
         TrinoConnection trinoConnection = new TrinoConnection();
         String catalogName = (String) GenericFun.getTrinoTableDetails(trinoTableName, "catalog");

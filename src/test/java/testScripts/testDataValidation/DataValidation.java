@@ -104,7 +104,7 @@ public class DataValidation extends BaseClass {
         columnNames = null;
         columnNames = GenericFun.removeTextFromString(postgreSQLColumnNames, "[");
         columnNames = GenericFun.removeTextFromString(columnNames, "]");
-        ArrayList<String> postgreSQLrecordWithColumnName = (ArrayList<String>) postgreSQLConnection.fetchRecordWithColumnName(columnNames, oracleTableName, "5");
+        ArrayList<String> postgreSQLrecordWithColumnName = (ArrayList<String>) postgreSQLConnection.fetchRecordWithColumnName(columnNames, oracleTableName, Config.limit);
         ArrayList<Object> postgreSQLSampleData = new ArrayList<Object>();
         for (int i = 0; i < postgreSQLrecordWithColumnName.size(); i++) {
             postgreSQLSampleData.add(postgreSQLConnection.fetchSampleRecord(columnNames, oracleTableName, postgreSQLrecordWithColumnName.get(i)));
