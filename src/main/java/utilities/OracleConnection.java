@@ -16,6 +16,19 @@ public class OracleConnection {
     private Statement stmt = null;
     private ResultSet rs = null;
 
+    public OracleConnection() {
+        printConfigs();
+    }
+
+    public static void printConfigs() {
+        logger.info("=======================================================");
+        logger.info("=========[ Oracle Host Name ] : " + Config.postgresqlHost);
+        logger.info("=========[ Oracle Port Number ] : " + Config.port);
+        logger.info("=========[ Oracle Database ] : " + Config.database);
+        logger.info("=========[ Oracle Username ] : " + Config.dbUsername);
+        logger.info("=======================================================\n");
+    }
+
     /**
      * Establishes a connection to PostgreSQL.
      *
@@ -31,7 +44,7 @@ public class OracleConnection {
             Class.forName("org.postgresql.Driver");
             // Establish connection
             conn = DriverManager.getConnection(POSTGRESQL_URL, Config.dbUsername, Config.dbPassword);
-            logger.info("✅ Oracle Connection established successfully!");
+//            logger.info("✅ Oracle Connection established successfully!");
         } catch (Exception e) {
             System.err.println("❌ Error connecting to database: " + e.getMessage());
             throw e;
@@ -98,7 +111,7 @@ public class OracleConnection {
 
     public int fetchNumberOfRecords(String pgTableName) {
         int count = 0;
-        String sql = "SELECT count(*) FROM " + pgTableName + ";";  // Query to get the count of employees
+        String sql = "SELECT count(*) FROM " + pgTableName + "";  // Query to get the count of employees
         logger.info("Oracle SQL Query:::: " + sql);
         try {
             Connection connection = connect();  // Step 1: Establish Connection
@@ -117,14 +130,15 @@ public class OracleConnection {
         return count;
     }
 
-    public List<String> fetchColumnNames(String postgreSQLTableDetails) {
+    public List<String> fetchColumnNames(String tableDetails) {
         List<String> columnNames = new ArrayList<>();
-        String schemaName = (String) GenericFun.getTableDetails(postgreSQLTableDetails, "schema");
-        String tableName = (String) GenericFun.getTableDetails(postgreSQLTableDetails, "table");
-        String sql = "SELECT column_name FROM information_schema.columns " +
-                "WHERE table_schema = '" + schemaName + "' " +
-                "AND table_name = '" + tableName + "' " +
-                "ORDER BY column_name;";
+        String schemaName = (String) GenericFun.getTableDetails(tableDetails, "schema");
+        String tableName = (String) GenericFun.getTableDetails(tableDetails, "table");
+        // Update SQL query for Oracle
+        String sql = "SELECT column_name FROM all_tab_columns " +
+                "WHERE owner = '" + schemaName.toUpperCase() + "' " +
+                "AND table_name = '" + tableName.toUpperCase() + "' " +
+                "ORDER BY column_name";
         logger.info("Oracle FOR GETTING COLUMN NAMES:: " + sql);
         Connection connection = null;
         Statement statement = null;
@@ -159,26 +173,28 @@ public class OracleConnection {
         return columnNames;
     }
 
-    public static ArrayList<String> fetchDuplicateRecords(String columnNames, String postgreSQLTableDetails) throws SQLException {
+
+    public static ArrayList<String> fetchDuplicateRecords(String columnNames, String tableDetails) throws SQLException {
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
-        String schemaName = (String) GenericFun.getTableDetails(postgreSQLTableDetails, "schema");
-        String tableName = (String) GenericFun.getTableDetails(postgreSQLTableDetails, "table");
+        String schemaName = (String) GenericFun.getTableDetails(tableDetails, "schema");
+        String tableName = (String) GenericFun.getTableDetails(tableDetails, "table");
+
         // Ensure columnNames is valid
         if (columnNames == null || columnNames.trim().isEmpty()) {
             throw new IllegalArgumentException("Column names cannot be null or empty");
         }
 
-        // Construct SQL query to find duplicate records in PostgreSQL
+        // Construct SQL query to find duplicate records in Oracle
         String sqlQuery = String.format(
                 "SELECT %s, COUNT(*) AS duplicate_count " +
                         "FROM %s.%s " +
                         "GROUP BY %s " +
                         "HAVING COUNT(*) > 1",
-                columnNames, schemaName, tableName, columnNames
+                columnNames, schemaName.toUpperCase(), tableName.toUpperCase(), columnNames
         );
-        logger.info("<<<<<POSTGRESQL SQL FOR DUPLICATE RECORDS>>>>> " + sqlQuery);
+        logger.info("ORACLE SQL FOR DUPLICATE RECORDS: " + sqlQuery);
         ArrayList<String> duplicateRecords = new ArrayList<>();
         try {
             // Establish Connection
@@ -206,8 +222,6 @@ public class OracleConnection {
                         rowRecord.setLength(rowRecord.length() - 3);
                     }
 
-                    // Print the full row
-//                    logger.info(rowRecord.toString());
                     // Store the full row record in the list
                     duplicateRecords.add(rowRecord.toString());
                 }
@@ -226,6 +240,7 @@ public class OracleConnection {
         }
         return duplicateRecords;
     }
+
 
     public List<String> fetchRecordWithColumnName(String columnNames, String table_Name, String limitRange) {
         List<String> queryResult = new ArrayList<>();

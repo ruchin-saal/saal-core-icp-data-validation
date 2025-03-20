@@ -125,6 +125,7 @@ public class TrinoTableMetaData {
     }
 
     public static void printConfigs() {
+        logger.info("=======================================================");
         logger.info("=========[ Trino Host Name ] : " + Config.trino_host);
         logger.info("=========[ Trino Port Number ] : " + Config.trino_port);
         logger.info("=========[ Trino Username ] : " + Config.trino_username);

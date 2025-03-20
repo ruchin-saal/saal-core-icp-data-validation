@@ -34,14 +34,14 @@ public class DataValidation extends BaseClass {
     public void validateColumnNamesAndDataType(String trinoTableName, String oracleTableName) throws Exception {
         Config.setConfigs();
         OracleConnection oracleConnection = new OracleConnection();
+        TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
         List<String> oracleResults = oracleConnection.fetchColumnNamesAndDataType(oracleTableName);
         ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, Config.removeOracleColumnAndDataType);
         logger.info("Oracle Table Column Names and Datatype>>" + updatedoracleListString);
-        logger.info("Validation result for 'Table Column names and Datatype' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
-        TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
         ArrayList<String> trinoResult = tableMetadata.fetchColumnNamesAndDataType(trinoTableName);
         ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, Config.removeTrinoColumnAndDataType);
         logger.info("TRINO Table Column Names and Datatype>>" + updatedTrinoListString);
+        logger.info("Validation result for 'Table Column names and Datatype' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
         AssertHelpers.compareColumnNameAndDataTypeListElementWise(updatedoracleListString, updatedTrinoListString);
     }
 
@@ -50,12 +50,12 @@ public class DataValidation extends BaseClass {
     @MethodSource("provideTableNames")
     public void validateNumberOfRecords(String trinoTableName, String oracleTableName) throws Exception {
         Config.setConfigs();
-        TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
-        int trinoResult = tableMetadata.fetchNumberOfRecords(trinoTableName);
-        logger.info("TRINO Number of Records >> " + trinoResult);
         OracleConnection oracleConnection = new OracleConnection();
+        TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
         int oracleResults = oracleConnection.fetchNumberOfRecords(oracleTableName);
         logger.info("ORACLE Number of Records >> " + oracleResults);
+        int trinoResult = tableMetadata.fetchNumberOfRecords(trinoTableName);
+        logger.info("TRINO Number of Records >> " + trinoResult);
         logger.info("Validation result for 'Number Of Records' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
         AssertHelpers.validateNumberOfRecords(oracleResults, trinoResult);
         AssertHelpers.softAssertAll();
@@ -66,6 +66,7 @@ public class DataValidation extends BaseClass {
     public void duplicateRecordInTable(String trinoTableName, String oracleTableName) throws Exception {
         Config.setConfigs();
         TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
+        OracleConnection oracleConnection = new OracleConnection();
         ArrayList<String> trinoResult = tableMetadata.fetchColumnNames(trinoTableName);
         ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, Config.removeTrinoColumn);
         String columnNames = null;
@@ -74,7 +75,6 @@ public class DataValidation extends BaseClass {
         columnNames = GenericFun.removeTextFromString(columnNames, "]");
         ArrayList<String> trinoDuplicateRecord = tableMetadata.duplicateRecords(columnNames, trinoTableName);
         //        logger.info("TRINO DUPLICATE RECORD>>"+trinoDuplicateRecord);
-        OracleConnection oracleConnection = new OracleConnection();
         List<String> oracleResults = oracleConnection.fetchColumnNames(oracleTableName);
         ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, Config.removeOracleColumn);
 //        logger.info("POSTGRESS>>"+updatedoracleListString);
