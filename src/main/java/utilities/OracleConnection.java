@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class PostgreSQLConnection {
-    private static final Logger logger = LogManager.getLogger(PostgreSQLConnection.class);
+public class OracleConnection {
+    private static final Logger logger = LogManager.getLogger(OracleConnection.class);
 
     private static String POSTGRESQL_URL;
     private static Connection conn = null;
@@ -80,7 +80,7 @@ public class PostgreSQLConnection {
         String tableName = (String) GenericFun.getPostgreSQLTableDetails(postgreSQLTableDetails, "table");
         String sql = "SELECT column_name, data_type FROM information_schema.columns " +
                 "WHERE table_schema = '" + schemaName + "' AND table_name = '" + tableName + "' ORDER BY column_name;";
-        logger.info("POSTGRESQL::" + sql);
+        logger.info("ORACLE::" + sql);
         try {
             connect();               // Step 1: Establish Connection
             queryResult = executeQuery(sql);  // Step 2: Execute Query
@@ -96,7 +96,7 @@ public class PostgreSQLConnection {
     public int fetchNumberOfRecords(String pgTableName) {
         int count = 0;
         String sql = "SELECT count(*) FROM " + pgTableName + ";";  // Query to get the count of employees
-        logger.info("POSTGRESQL SQL Query:::: " + sql);
+        logger.info("Oracle SQL Query:::: " + sql);
         try {
             Connection connection = connect();  // Step 1: Establish Connection
             // Execute the query and retrieve the count value
@@ -122,7 +122,7 @@ public class PostgreSQLConnection {
                 "WHERE table_schema = '" + schemaName + "' " +
                 "AND table_name = '" + tableName + "' " +
                 "ORDER BY column_name;";
-        logger.info("POSTGRESQL FOR GETTING COLUMN NAMES:: " + sql);
+        logger.info("Oracle FOR GETTING COLUMN NAMES:: " + sql);
         Connection connection = null;
         Statement statement = null;
         ResultSet resultSet = null;
@@ -232,7 +232,7 @@ public class PostgreSQLConnection {
                 "SELECT DISTINCT %s FROM %s LIMIT %s",
                 columnNames, table_Name, limitRange
         );
-        logger.info("POSTGRESQL FETCH DATA::" + sql);
+        logger.info("Oracle FETCH DATA::" + sql);
         try {
             connect();               // Step 1: Establish Connection
             queryResult = executeQueryForRecords(sql);  // Step 2: Execute Query
@@ -253,7 +253,7 @@ public class PostgreSQLConnection {
                 columnName, table_Name, whereClause
         );
 
-        logger.info("POSTGRESQL::" + sql);
+        logger.info("Oracle::" + sql);
         try {
             connect();               // Step 1: Establish Connection
             queryResult = executeQueryForRecords(sql);  // Step 2: Execute Query
