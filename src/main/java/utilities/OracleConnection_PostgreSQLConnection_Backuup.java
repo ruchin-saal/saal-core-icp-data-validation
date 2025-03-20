@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class OracleConnection {
-    private static final Logger logger = LogManager.getLogger(OracleConnection.class);
+public class OracleConnection_PostgreSQLConnection_Backuup {
+    private static final Logger logger = LogManager.getLogger(OracleConnection_PostgreSQLConnection_Backuup.class);
 
     private static String POSTGRESQL_URL;
     private static Connection conn = null;
@@ -23,15 +23,14 @@ public class OracleConnection {
      */
     public static Connection connect() throws Exception {
         Config.setConfigs();
-//        jdbc:oracle:thin:@//192.168.171.119:1522/PDB1
-        POSTGRESQL_URL = "jdbc:oracle:thin:@//" + Config.postgresqlHost + ":" + Config.port + "/" + Config.database;
+        POSTGRESQL_URL = "jdbc:postgresql://" + Config.postgresqlHost + ":" + Config.port + "/" + Config.database;
 
         try {
             // Load PostgreSQL JDBC Driver
             Class.forName("org.postgresql.Driver");
             // Establish connection
             conn = DriverManager.getConnection(POSTGRESQL_URL, Config.dbUsername, Config.dbPassword);
-            logger.info("✅ Oracle Connection established successfully!");
+//            logger.info("✅ POSTGRESQL Connection established successfully!");
         } catch (Exception e) {
             System.err.println("❌ Error connecting to database: " + e.getMessage());
             throw e;
@@ -79,9 +78,8 @@ public class OracleConnection {
         List<String> queryResult = new ArrayList<>();
         String schemaName = (String) GenericFun.getTableDetails(postgreSQLTableDetails, "schema");
         String tableName = (String) GenericFun.getTableDetails(postgreSQLTableDetails, "table");
-        // Updated SQL query for Oracle
-        String sql = "SELECT column_name, data_type FROM all_tab_columns " +
-                "WHERE owner = '" + schemaName.toUpperCase() + "' AND table_name = '" + tableName.toUpperCase() + "' ORDER BY column_name";
+        String sql = "SELECT column_name, data_type FROM information_schema.columns " +
+                "WHERE table_schema = '" + schemaName + "' AND table_name = '" + tableName + "' ORDER BY column_name;";
         logger.info("ORACLE::" + sql);
         try {
             connect();               // Step 1: Establish Connection
@@ -94,7 +92,6 @@ public class OracleConnection {
         Collections.sort(queryResult);
         return queryResult;
     }
-
 
     public int fetchNumberOfRecords(String pgTableName) {
         int count = 0;

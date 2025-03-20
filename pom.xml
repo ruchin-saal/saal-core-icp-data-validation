@@ -31,6 +31,7 @@
         <lombok.version>1.18.28</lombok.version>
         <maven.ant.version>3.1.0</maven.ant.version>
         <postgresql.version>42.7.1</postgresql.version>
+        <oracle.jdbc.version>19.8.0.0</oracle.jdbc.version>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy_MM_dd_hh_mm_a</maven.build.timestamp.format>
     </properties>
@@ -47,7 +48,12 @@
             <version>${postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId> <!-- Use ojdbc10 for Java 10, etc., if required -->
+            <version>${oracle.jdbc.version}</version>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
             <artifactId>serenity-core</artifactId>

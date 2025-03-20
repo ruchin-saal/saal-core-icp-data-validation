@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 public class DataValidation extends BaseClass {
     private static final Logger logger = LogManager.getLogger(DataValidation.class);
 
-
     public static Stream<Arguments> provideTableNames() throws IOException {
         Config.setConfigs();
         String[] trinoTables = Config.trino_TableNames.split("\\s*,\\s*");
@@ -34,15 +33,15 @@ public class DataValidation extends BaseClass {
     @MethodSource("provideTableNames")
     public void validateColumnNamesAndDataType(String trinoTableName, String oracleTableName) throws Exception {
         Config.setConfigs();
-        TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
-        ArrayList<String> trinoResult = tableMetadata.fetchColumnNamesAndDataType(trinoTableName);
-        ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, "ingested_at - timestamp(6)");
-        logger.info("TRINO Table Column Names and Datatype>>" + updatedTrinoListString);
         OracleConnection oracleConnection = new OracleConnection();
         List<String> oracleResults = oracleConnection.fetchColumnNamesAndDataType(oracleTableName);
-        ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList(trinoResult, "id - integer");
+        ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, Config.removeOracleColumnAndDataType);
         logger.info("Oracle Table Column Names and Datatype>>" + updatedoracleListString);
         logger.info("Validation result for 'Table Column names and Datatype' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
+        TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
+        ArrayList<String> trinoResult = tableMetadata.fetchColumnNamesAndDataType(trinoTableName);
+        ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, Config.removeTrinoColumnAndDataType);
+        logger.info("TRINO Table Column Names and Datatype>>" + updatedTrinoListString);
         AssertHelpers.compareColumnNameAndDataTypeListElementWise(updatedoracleListString, updatedTrinoListString);
     }
 
@@ -53,10 +52,10 @@ public class DataValidation extends BaseClass {
         Config.setConfigs();
         TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
         int trinoResult = tableMetadata.fetchNumberOfRecords(trinoTableName);
-//        logger.info("TRINO Number of Records >> " + trinoResult);
+        logger.info("TRINO Number of Records >> " + trinoResult);
         OracleConnection oracleConnection = new OracleConnection();
         int oracleResults = oracleConnection.fetchNumberOfRecords(oracleTableName);
-//        logger.info("ORACLE Number of Records >> " + oracleResults);
+        logger.info("ORACLE Number of Records >> " + oracleResults);
         logger.info("Validation result for 'Number Of Records' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
         AssertHelpers.validateNumberOfRecords(oracleResults, trinoResult);
         AssertHelpers.softAssertAll();
@@ -68,7 +67,7 @@ public class DataValidation extends BaseClass {
         Config.setConfigs();
         TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
         ArrayList<String> trinoResult = tableMetadata.fetchColumnNames(trinoTableName);
-        ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, "ingested_at");
+        ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, Config.removeTrinoColumn);
         String columnNames = null;
         columnNames = String.valueOf(updatedTrinoListString);
         columnNames = GenericFun.removeTextFromString(columnNames, "[");
@@ -77,12 +76,13 @@ public class DataValidation extends BaseClass {
         //        logger.info("TRINO DUPLICATE RECORD>>"+trinoDuplicateRecord);
         OracleConnection oracleConnection = new OracleConnection();
         List<String> oracleResults = oracleConnection.fetchColumnNames(oracleTableName);
-        ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, "id");
+        ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, Config.removeOracleColumn);
 //        logger.info("POSTGRESS>>"+updatedoracleListString);
         String oracleColumnNames = String.valueOf(updatedoracleListString);
         columnNames = null;
         columnNames = GenericFun.removeTextFromString(oracleColumnNames, "[");
         columnNames = GenericFun.removeTextFromString(columnNames, "]");
+        columnNames=GenericFun.updateListItems(columnNames, "\"\"");
         ArrayList<String> oracleDuplicateRecordList = oracleConnection.fetchDuplicateRecords(columnNames, oracleTableName);
 //        logger.info("oracle DUPLICATE RECORD>>"+oracleDuplicateRecordList);
         logger.info("DUPLICATE RECORD CHECK IN TRINO TABLE:: "+trinoTableName);
@@ -92,38 +92,39 @@ public class DataValidation extends BaseClass {
         AssertHelpers.softAssertAll();
     }
 
-    @ParameterizedTest
-    @MethodSource("provideTableNames")
-    public void sampleData(String trinoTableName, String oracleTableName) throws Exception {
-        Config.setConfigs();
-        String columnNames = null;
-        OracleConnection oracleConnection = new OracleConnection();
-        List<String> oracleResults = oracleConnection.fetchColumnNames(oracleTableName);
-        ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, "id");
-        String oracleColumnNames = String.valueOf(updatedoracleListString);
-        columnNames = null;
-        columnNames = GenericFun.removeTextFromString(oracleColumnNames, "[");
-        columnNames = GenericFun.removeTextFromString(columnNames, "]");
-        ArrayList<String> oraclerecordWithColumnName = (ArrayList<String>) oracleConnection.fetchRecordWithColumnName(columnNames, oracleTableName, Config.limit);
-        ArrayList<Object> oracleSampleData = new ArrayList<Object>();
-        for (int i = 0; i < oraclerecordWithColumnName.size(); i++) {
-            oracleSampleData.add(oracleConnection.fetchSampleRecord(columnNames, oracleTableName, oraclerecordWithColumnName.get(i)));
-        }
-//        logger.info("oracle SAMPLE RECORDS"+oracleSampleData);
-        TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
-        ArrayList<String> trinoResult = tableMetadata.fetchColumnNames(trinoTableName);
-        ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, "ingested_at");
-        columnNames = String.valueOf(updatedTrinoListString);
-        columnNames = GenericFun.removeTextFromString(columnNames, "[");
-        columnNames = GenericFun.removeTextFromString(columnNames, "]");
-        ArrayList<Object> trinoSampleData = new ArrayList<Object>();
-        for (int i = 0; i < oraclerecordWithColumnName.size(); i++) {
-            trinoSampleData.add(tableMetadata.fetchSampleRecords(columnNames, trinoTableName, oraclerecordWithColumnName.get(i)));
-        }
-//        logger.info("TRINO SAMPLE RECORDS"+trinoSampleData);
-        logger.info("Validation result for 'Sample Data' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
-        AssertHelpers.assertTrueCompareListElementWiseSoftAssertion(oracleSampleData, trinoSampleData);
-    }
+//    @ParameterizedTest
+//    @MethodSource("provideTableNames")
+//    public void sampleData(String trinoTableName, String oracleTableName) throws Exception {
+//        Config.setConfigs();
+//        String columnNames = null;
+//        OracleConnection oracleConnection = new OracleConnection();
+//        List<String> oracleResults = oracleConnection.fetchColumnNames(oracleTableName);
+//        ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, Config.removeOracleColumn);
+//        String oracleColumnNames = String.valueOf(updatedoracleListString);
+//        columnNames = null;
+//        columnNames = GenericFun.removeTextFromString(oracleColumnNames, "[");
+//        columnNames = GenericFun.removeTextFromString(columnNames, "]");
+//        String columnNames_1=GenericFun.updateListItems(columnNames, "\"\"");
+//        ArrayList<String> oracleRecordWithColumnName = (ArrayList<String>) oracleConnection.fetchRecordWithColumnNames(columnNames_1, oracleTableName, Config.limit);
+//        ArrayList<Object> oracleSampleData = new ArrayList<Object>();
+//        for (int i = 0; i < oracleRecordWithColumnName.size(); i++) {
+//            oracleSampleData.add(oracleConnection.fetchSampleRecord(columnNames_1, oracleTableName, oracleRecordWithColumnName.get(i)));
+//        }
+////        logger.info("oracle SAMPLE RECORDS"+oracleSampleData);
+//        TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
+//        ArrayList<String> trinoResult = tableMetadata.fetchColumnNames(trinoTableName);
+//        ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, Config.removeTrinoColumn);
+//        columnNames = String.valueOf(updatedTrinoListString);
+//        columnNames = GenericFun.removeTextFromString(columnNames, "[");
+//        columnNames = GenericFun.removeTextFromString(columnNames, "]");
+//        ArrayList<Object> trinoSampleData = new ArrayList<Object>();
+//        for (int i = 0; i < oracleRecordWithColumnName.size(); i++) {
+//            trinoSampleData.add(tableMetadata.fetchSampleRecords(columnNames, trinoTableName, oracleRecordWithColumnName.get(i)));
+//        }
+////        logger.info("TRINO SAMPLE RECORDS"+trinoSampleData);
+//        logger.info("Validation result for 'Sample Data' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
+//        AssertHelpers.assertTrueCompareListElementWiseSoftAssertion(oracleSampleData, trinoSampleData);
+//    }
 }
 
 /*

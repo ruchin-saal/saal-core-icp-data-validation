@@ -344,7 +344,7 @@ public class GenericFun {
         }
     }
 
-    public static Object getPostgreSQLTableDetails(String input, String category) {
+    public static Object getTableDetails(String input, String category) {
         // Validate input
         if (input == null || input.isEmpty() || !input.contains(".")) {
             throw new IllegalArgumentException("Invalid input format. Expected format: schema.table");
@@ -367,5 +367,23 @@ public class GenericFun {
                 throw new IllegalArgumentException("Invalid category. 'schema', and 'table'.");
         }
     }
+
+    public static String updateListItems(String originalList, String addContent) {
+        // Use the provided originalList instead of hardcoded input string
+        String input = originalList;
+        // Split the input string by commas
+        String[] parts = input.split(", ");
+        // Loop through the parts and add quotes around each element
+        StringBuilder output = new StringBuilder();
+        for (int i = 0; i < parts.length; i++) {
+            output.append("\"").append(parts[i]).append("\"");
+            if (i < parts.length - 1) {
+                output.append(", ");
+            }
+        }
+        return output.toString();
+    }
+
+
 
 }

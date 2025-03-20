@@ -52,6 +52,10 @@ public class Config {
     public static String catalogs_tranformed;
     public static String schemas_tranformed;
     public static String  limit;
+    public static String removeTrinoColumn;
+    public static String removeTrinoColumnAndDataType;
+    public static String removeOracleColumn;
+    public static String removeOracleColumnAndDataType;
 
     /*Postgresql Config Variables*/
     public static String postgresqlHost;
@@ -126,5 +130,9 @@ public class Config {
         pg_schema_name = LoadProperty.getProperty("pg_schema_name");
         trino_TableNames = LoadProperty.getProperty("trino_TableNames");
         limit = LoadProperty.getProperty("limit");
+        removeTrinoColumn = LoadProperty.getProperty("removeTrinoColumn");
+        removeTrinoColumnAndDataType = LoadProperty.getProperty("removeTrinoColumnAndDataType");
+        removeOracleColumn = LoadProperty.getProperty("removeOracleColumn");
+        removeOracleColumnAndDataType = LoadProperty.getProperty("removeOracleColumnAndDataType");
     }
 }
