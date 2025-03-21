@@ -6,6 +6,8 @@ import org.apache.logging.log4j.Logger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GenericFun {
     private static final Logger logger = LogManager.getLogger(GenericFun.class);
@@ -382,6 +384,24 @@ public class GenericFun {
             }
         }
         return output.toString();
+    }
+
+    public static String formatSQLColumnWithDoubleQuote(String input) {
+        // Pattern to find identifiers before "=" and re-quote them even if they are already quoted
+        String regex = "(\"?\\b[a-zA-Z_][a-zA-Z0-9_]*\\b\"?)\\s*=\\s*(\\d+|'[^']*'|\"[^\"]*\"|[^\\s]+)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            // Replace existing quotes if any, then reapply them
+            String columnWithoutQuotes = matcher.group(1).replaceAll("\"", "");
+            String replacement = "\"" + columnWithoutQuotes + "\"=" + matcher.group(2);
+            // Append the replacement to the StringBuffer
+            matcher.appendReplacement(sb, replacement);
+        }
+        // Append the tail of the input (after the last match) to the StringBuffer
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
 

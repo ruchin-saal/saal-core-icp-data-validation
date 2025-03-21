@@ -247,8 +247,8 @@ public class OracleConnection {
         String schemaName = (String) GenericFun.getTableDetails(table_Name, "schema");
         String tableName = (String) GenericFun.getTableDetails(table_Name, "table");
         String sql = String.format(
-                "SELECT DISTINCT %s FROM %s LIMIT %s",
-                columnNames, table_Name, limitRange
+                "SELECT DISTINCT %s FROM %s FETCH FIRST %s ROWS ONLY",
+                columnNames, tableName, limitRange
         );
         logger.info("Oracle FETCH DATA::" + sql);
         try {
@@ -267,10 +267,10 @@ public class OracleConnection {
         String schemaName = (String) GenericFun.getTableDetails(table_Name, "schema");
         String tableName = (String) GenericFun.getTableDetails(table_Name, "table");
         String sql = String.format(
-                "SELECT %s FROM %s WHERE %s LIMIT 1",
+                "SELECT %s FROM %s WHERE %s FETCH FIRST 1 ROWS ONLY",
                 columnName, table_Name, whereClause
         );
-
+        sql=GenericFun.formatSQLColumnWithDoubleQuote(sql);
         logger.info("Oracle::" + sql);
         try {
             connect();               // Step 1: Establish Connection
