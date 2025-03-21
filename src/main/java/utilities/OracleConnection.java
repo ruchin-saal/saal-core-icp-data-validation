@@ -248,7 +248,7 @@ public class OracleConnection {
         String tableName = (String) GenericFun.getTableDetails(table_Name, "table");
         String sql = String.format(
                 "SELECT DISTINCT %s FROM %s FETCH FIRST %s ROWS ONLY",
-                columnNames, tableName, limitRange
+                columnNames, table_Name, limitRange
         );
         logger.info("Oracle FETCH DATA::" + sql);
         try {
