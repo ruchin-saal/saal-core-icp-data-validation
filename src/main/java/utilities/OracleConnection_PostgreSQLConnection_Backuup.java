@@ -23,7 +23,7 @@ public class OracleConnection_PostgreSQLConnection_Backuup {
      */
     public static Connection connect() throws Exception {
         Config.setConfigs();
-        POSTGRESQL_URL = "jdbc:postgresql://" + Config.postgresqlHost + ":" + Config.port + "/" + Config.database;
+        POSTGRESQL_URL = "jdbc:postgresql://" + Config.oracleHost + ":" + Config.port + "/" + Config.database;
 
         try {
             // Load PostgreSQL JDBC Driver

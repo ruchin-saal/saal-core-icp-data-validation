@@ -3,20 +3,19 @@ package testScripts.testDataValidation;
 import baseConfig.BaseClass;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 import utilities.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class DataValidation extends BaseClass {
     private static final Logger logger = LogManager.getLogger(DataValidation.class);
 
-    public static Stream<Arguments> provideTableNames() throws IOException {
+    @DataProvider(name = "tableNames")
+    public Object[][] provideTableNames() throws IOException {
         Config.setConfigs();
         String[] trinoTables = Config.trino_TableNames.split("\\s*,\\s*");
         String[] oracleTables = Config.oracle_TableNames.split("\\s*,\\s*");
@@ -24,45 +23,45 @@ public class DataValidation extends BaseClass {
         if (trinoTables.length != oracleTables.length) {
             throw new IllegalArgumentException("Mismatch in table count between Trino and Oracle");
         }
-        return Stream.iterate(0, i -> i + 1)
-                .limit(trinoTables.length)
-                .map(i -> Arguments.of(trinoTables[i], oracleTables[i]));
+
+        Object[][] data = new Object[trinoTables.length][2];
+        for (int i = 0; i < trinoTables.length; i++) {
+            data[i][0] = trinoTables[i];
+            data[i][1] = oracleTables[i];
+        }
+        return data;
     }
 
-    @ParameterizedTest
-    @MethodSource("provideTableNames")
+    @Test(dataProvider = "tableNames")
     public void validateColumnNamesAndDataType(String trinoTableName, String oracleTableName) throws Exception {
         Config.setConfigs();
         OracleConnection oracleConnection = new OracleConnection();
         TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
         List<String> oracleResults = oracleConnection.fetchColumnNamesAndDataType(oracleTableName);
-        ArrayList<String> updatedoracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, Config.removeOracleColumnAndDataType);
-        logger.info("Oracle Table Column Names and Datatype>>" + updatedoracleListString);
+        ArrayList<String> updatedOracleListString = GenericFun.removeItemFromList((ArrayList<String>) oracleResults, Config.removeOracleColumnAndDataType);
         ArrayList<String> trinoResult = tableMetadata.fetchColumnNamesAndDataType(trinoTableName);
         ArrayList<String> updatedTrinoListString = GenericFun.removeItemFromList(trinoResult, Config.removeTrinoColumnAndDataType);
+        logger.info("Oracle Table Column Names and Datatype>>" + updatedOracleListString);
         logger.info("TRINO Table Column Names and Datatype>>" + updatedTrinoListString);
         logger.info("Validation result for 'Table Column names and Datatype' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
-        AssertHelpers.compareColumnNameAndDataTypeListElementWise(updatedoracleListString, updatedTrinoListString);
+        AssertHelpers.compareColumnNameAndDataTypeListElementWise(updatedOracleListString, updatedTrinoListString);
     }
 
-
-    @ParameterizedTest
-    @MethodSource("provideTableNames")
+    @Test(dataProvider = "tableNames")
     public void validateNumberOfRecords(String trinoTableName, String oracleTableName) throws Exception {
         Config.setConfigs();
         OracleConnection oracleConnection = new OracleConnection();
         TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
         int oracleResults = oracleConnection.fetchNumberOfRecords(oracleTableName);
-        logger.info("ORACLE Number of Records >> " + oracleResults);
         int trinoResult = tableMetadata.fetchNumberOfRecords(trinoTableName);
-        logger.info("TRINO Number of Records >> " + trinoResult);
         logger.info("Validation result for 'Number Of Records' for Oracle Table:: "+ oracleTableName+ " and Trino for Table:: "+trinoTableName);
+        logger.info("ORACLE Number of Records >> " + oracleResults);
+        logger.info("TRINO Number of Records >> " + trinoResult);
         AssertHelpers.validateNumberOfRecords(oracleResults, trinoResult);
         AssertHelpers.softAssertAll();
     }
 
-    @ParameterizedTest
-    @MethodSource("provideTableNames")
+    @Test(dataProvider = "tableNames")
     public void duplicateRecordInTable(String trinoTableName, String oracleTableName) throws Exception {
         Config.setConfigs();
         TrinoTableMetaData tableMetadata = new TrinoTableMetaData();
@@ -92,8 +91,7 @@ public class DataValidation extends BaseClass {
         AssertHelpers.softAssertAll();
     }
 
-    @ParameterizedTest
-    @MethodSource("provideTableNames")
+    @Test(dataProvider = "tableNames")
     public void sampleData(String trinoTableName, String oracleTableName) throws Exception {
         Config.setConfigs();
         String columnNames = null;

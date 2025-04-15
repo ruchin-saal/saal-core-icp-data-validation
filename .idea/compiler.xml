@@ -10,5 +10,6 @@
         <module name="alain-data-validation" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="1.6" />
   </component>
 </project>

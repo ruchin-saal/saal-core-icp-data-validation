@@ -58,7 +58,7 @@ public class Config {
     public static String removeOracleColumnAndDataType;
 
     /*Postgresql Config Variables*/
-    public static String postgresqlHost;
+    public static String oracleHost;
     public static String port;
     public static String database;
     public static String dbUsername;
@@ -121,7 +121,7 @@ public class Config {
         compatibility_scores_table=LoadProperty.getProperty("compatibility_scores_table");
         catalogs_tranformed =LoadProperty.getProperty("catalogs_tranformed");
         schemas_tranformed =LoadProperty.getProperty("schemas_tranformed");
-        postgresqlHost = LoadProperty.getProperty("postgresql_host");
+        oracleHost = LoadProperty.getProperty("postgresql_host");
         port = LoadProperty.getProperty("port");
         database = LoadProperty.getProperty("database");
         dbUsername = LoadProperty.getProperty("db_username");

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.saal</groupId>
-    <artifactId>alain-data-validation</artifactId>
+    <artifactId>icp-data-validation</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -24,7 +24,6 @@
         <commons-lang3.version>3.14.0</commons-lang3.version>
         <groovy.version>5.0.0-alpha-4</groovy.version>
         <mongodb.version>4.11.1</mongodb.version>
-        <junit.version>5.10.0</junit.version>
         <apache-poi.version>5.2.5</apache-poi.version>
         <faker.version>1.0.2</faker.version>
         <jwt.version>4.4.0</jwt.version>
@@ -34,6 +33,7 @@
         <oracle.jdbc.version>19.8.0.0</oracle.jdbc.version>
         <timestamp>${maven.build.timestamp}</timestamp>
         <maven.build.timestamp.format>yyyy_MM_dd_hh_mm_a</maven.build.timestamp.format>
+        <testng.version>7.10.2</testng.version>
     </properties>
 
     <dependencies>
@@ -60,9 +60,10 @@
             <version>${serenity.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.serenity-bdd</groupId>
-            <artifactId>serenity-junit5</artifactId>
-            <version>${serenity.version}</version>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.serenity-bdd</groupId>
@@ -158,19 +159,7 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${apache-poi.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-            <scope>compile</scope>
-        </dependency>
 
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>com.github.javafaker</groupId>
             <artifactId>javafaker</artifactId>

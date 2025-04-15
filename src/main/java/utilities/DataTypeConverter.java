@@ -11,25 +11,6 @@ public class DataTypeConverter {
     private static final Map<String, String> ORACLE_TO_TRINO = new HashMap<>();
 
     static {
-         /*CONVERSION POSTGRESQL TO TRINO*/
-//        POSTGRES_TO_TRINO.put("character varying", "varchar");
-//        POSTGRES_TO_TRINO.put("varchar", "varchar");
-//        POSTGRES_TO_TRINO.put("text", "varchar");
-//        POSTGRES_TO_TRINO.put("char", "char");
-//        POSTGRES_TO_TRINO.put("integer", "integer");
-//        POSTGRES_TO_TRINO.put("bigint", "bigint");
-//        POSTGRES_TO_TRINO.put("smallint", "smallint");
-//        POSTGRES_TO_TRINO.put("numeric", "decimal");
-//        POSTGRES_TO_TRINO.put("decimal", "decimal");
-//        POSTGRES_TO_TRINO.put("real", "real");
-//        POSTGRES_TO_TRINO.put("double precision", "double");
-//        POSTGRES_TO_TRINO.put("boolean", "boolean");
-//        POSTGRES_TO_TRINO.put("bytea", "varbinary");
-//        POSTGRES_TO_TRINO.put("json", "json");
-//        POSTGRES_TO_TRINO.put("jsonb", "json");
-//        POSTGRES_TO_TRINO.put("date", "date");
-//        POSTGRES_TO_TRINO.put("timestamp without time zone", "timestamp");
-//        POSTGRES_TO_TRINO.put("timestamp with time zone", "timestamp with time zone");
         /*CONVERSION ORACLE TO TRINO*/
         ORACLE_TO_TRINO.put("varchar2", "varchar");
         ORACLE_TO_TRINO.put("nvarchar2", "varchar");
@@ -50,11 +31,30 @@ public class DataTypeConverter {
         ORACLE_TO_TRINO.put("raw", "varbinary");
         ORACLE_TO_TRINO.put("bfile", "varbinary");
         ORACLE_TO_TRINO.put("boolean", "boolean");
+         /*CONVERSION POSTGRESQL TO TRINO*/
+//        POSTGRES_TO_TRINO.put("character varying", "varchar");
+//        POSTGRES_TO_TRINO.put("varchar", "varchar");
+//        POSTGRES_TO_TRINO.put("text", "varchar");
+//        POSTGRES_TO_TRINO.put("char", "char");
+//        POSTGRES_TO_TRINO.put("integer", "integer");
+//        POSTGRES_TO_TRINO.put("bigint", "bigint");
+//        POSTGRES_TO_TRINO.put("smallint", "smallint");
+//        POSTGRES_TO_TRINO.put("numeric", "decimal");
+//        POSTGRES_TO_TRINO.put("decimal", "decimal");
+//        POSTGRES_TO_TRINO.put("real", "real");
+//        POSTGRES_TO_TRINO.put("double precision", "double");
+//        POSTGRES_TO_TRINO.put("boolean", "boolean");
+//        POSTGRES_TO_TRINO.put("bytea", "varbinary");
+//        POSTGRES_TO_TRINO.put("json", "json");
+//        POSTGRES_TO_TRINO.put("jsonb", "json");
+//        POSTGRES_TO_TRINO.put("date", "date");
+//        POSTGRES_TO_TRINO.put("timestamp without time zone", "timestamp");
+//        POSTGRES_TO_TRINO.put("timestamp with time zone", "timestamp with time zone");
 
     }
 
     // Method to convert PostgreSQL column definitions to Trino format
-    public static List<String> convertPostgresToTrino(List<String> postgresColumns) {
+    public static List<String> convertOracleToTrino(List<String> postgresColumns) {
         List<String> trinoColumns = new ArrayList<>();
 
         for (String column : postgresColumns) {

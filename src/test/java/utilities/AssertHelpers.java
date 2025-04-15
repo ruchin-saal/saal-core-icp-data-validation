@@ -1,19 +1,20 @@
+
 package utilities;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.Assertions;
+import org.testng.Assert;
+import org.testng.asserts.SoftAssert;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static utilities.DataTypeConverter.convertPostgresToTrino;
+import static utilities.DataTypeConverter.convertOracleToTrino;
 
 public class AssertHelpers {
     private static final Logger logger = LogManager.getLogger(AssertHelpers.class);
-    static SoftAssertions softAssert = new SoftAssertions();
+    static SoftAssert softAssert = new SoftAssert();
 
     public static void assertTrueCompareListElementWise(List apiList, List dbList) {
         apiList.removeIf(item -> item == null);
@@ -21,7 +22,8 @@ public class AssertHelpers {
         Collections.sort(apiList);
         Collections.sort(dbList);
         for (int i = 0; i < apiList.size(); i++) {
-            Assertions.assertTrue(apiList.get(i).equals(dbList.get(i)));
+            Assert.assertTrue(apiList.get(i).equals(dbList.get(i)),
+                    "Mismatch at index " + i + ": " + apiList.get(i) + " != " + dbList.get(i));
         }
     }
 
@@ -30,27 +32,20 @@ public class AssertHelpers {
         dbList.removeIf(item -> item == null);
         Collections.sort(apiList);
         Collections.sort(dbList);
-        Assertions.assertTrue(apiList.equals(dbList));
-
+        Assert.assertEquals(apiList, dbList, "List comparison failed.");
     }
 
-
     public static void softAssertTrue(List apiList, List dbList) {
-        apiList.removeIf(item -> item == null);
-        apiList.removeIf(item -> item == "null");
-        dbList.removeIf(item -> item == null);
-        dbList.removeIf(item -> item == "null");
+        apiList.removeIf(item -> item == null || "null".equals(item));
+        dbList.removeIf(item -> item == null || "null".equals(item));
         Collections.sort(apiList);
         Collections.sort(dbList);
-        if (apiList.equals(dbList)) {
-            logger.info("Assertion Passed number of records in API column is: " + apiList.size() + " number of records in DB is: " + dbList.size());
-        }
         if (!apiList.equals(dbList)) {
-            logger.info("Assertion Failed API data is not matching with DB data \nAPI DATA: \n" + apiList + "\nDB data: \n" + dbList + "\n number of records in API column is: " + apiList.size() + " number of records in DB is: " + dbList.size());
-            logger.info("This is value is not in API" + GenericFun.missingDataInSecondList(dbList, apiList));
-            logger.info("This is value is not in DB" + GenericFun.missingDataInSecondList(apiList, dbList));
+            logger.info("Assertion Failed API data is not matching with DB data \nAPI DATA: \n" + apiList + "\nDB data: \n" + dbList);
+            logger.info("Missing in API: " + GenericFun.missingDataInSecondList(dbList, apiList));
+            logger.info("Missing in DB: " + GenericFun.missingDataInSecondList(apiList, dbList));
         }
-//        Assertions.assertTrue(apiList.equals(dbList));
+        softAssert.assertEquals(apiList, dbList, "Soft assert list mismatch");
     }
 
     public static void softAssertTrueCompareListElementWise(List apiList, List dbList) {
@@ -59,7 +54,7 @@ public class AssertHelpers {
         Collections.sort(apiList);
         Collections.sort(dbList);
         for (int i = 0; i < apiList.size(); i++) {
-            Assertions.assertTrue(apiList.get(i).equals(dbList.get(i)));
+            softAssert.assertEquals(apiList.get(i), dbList.get(i), "Mismatch at index " + i);
         }
     }
 
@@ -68,94 +63,43 @@ public class AssertHelpers {
         dbList.removeIf(item -> item == null);
         Collections.sort(apiList);
         Collections.sort(dbList);
-
-        if (!apiList.equals(dbList)) {
-            logger.info("Assertion Failed due to Data Mismatch \n\n\n\n\nAPI DATA: \n" + apiList + "\n\n\n\n\nDB data: " + dbList + "\n\n\n\n\n number of records in API column is: " + apiList.size() + " number of records in DB is: " + dbList.size());
-
-        }
-        Assertions.assertTrue(apiList.equals(dbList));
-
+        softAssert.assertEquals(apiList, dbList, "List mismatch with contains");
     }
 
     public static void softAssertTrueToCheckDuplicateValue(List dbValue) {
-        Assertions.assertTrue(dbValue.size() == 0);
-        if (dbValue.size() == 0) {
-            logger.info("DUPLICATE RECORD NOT FOUND");
-        }
+        Assert.assertTrue(dbValue.size() == 0, "Duplicate values found: " + dbValue.size());
     }
 
     public static void softAssertTrueNumberOfRecordsVerification(List apiList, List dbList) {
-//        apiList.removeIf(item -> item == null);
-//        dbList.removeIf(item -> item == null);
-//        Collections.sort(apiList);
-//        Collections.sort(dbList);
-//        if(!apiList.equals(dbList)) {
-//            logger.info("Failed API data is not matching with DB data \nAPI DATA: \n" + apiList + "\nDB data: \n"+ dbList+"\n number of records in API column is: "+apiList.size()+" number of records in DB is: "+dbList.size());
-//        }
-        Assertions.assertTrue(apiList.size() == dbList.size());
+        Assert.assertEquals(apiList.size(), dbList.size(), "Record count mismatch");
     }
 
     public static void softAssertMatchTwoList(List list1, List list2) {
-        list1.removeIf(item -> item == null);
-        list1.removeIf(item -> item == "null");
-        list2.removeIf(item -> item == null);
-        list2.removeIf(item -> item == "null");
+        list1.removeIf(item -> item == null || "null".equals(item));
+        list2.removeIf(item -> item == null || "null".equals(item));
         Collections.sort(list1);
         Collections.sort(list2);
-        if (list1.equals(list2)) {
-            logger.info("Assertion Passed number of records in API column is: " + list1.size() + " number of records in DB is: " + list2.size());
-        }
-        if (!list1.equals(list2)) {
-            logger.info("Assertion Failed API data is not matching with DB data \nAPI DATA: \n" + list1 + "\nDB data: \n" + list2 + "" +
-                    "\n number of records in API column is: " + list1.size() + " number of records in DB is: " + list2.size());
-        }
-        Assertions.assertTrue(list1.equals(list2));
+        softAssert.assertEquals(list1, list2, "Lists mismatch");
     }
 
     public static void softAssertTrueForIntegerConvertedList(List apiList, List dbList) {
-        apiList.removeIf(item -> item == null);
-        apiList.removeIf(item -> item == "null");
-        dbList.removeIf(item -> item == null);
-        dbList.removeIf(item -> item == "null");
-        List<Integer> updatedApiList = new ArrayList<>();
-        updatedApiList.addAll(apiList);
-        List<Integer> updatedDbList = new ArrayList<>();
-        updatedDbList.addAll(dbList);
-
+        apiList.removeIf(item -> item == null || "null".equals(item));
+        dbList.removeIf(item -> item == null || "null".equals(item));
+        List<Integer> updatedApiList = new ArrayList<>(apiList);
+        List<Integer> updatedDbList = new ArrayList<>(dbList);
         Collections.sort(updatedApiList);
         Collections.sort(updatedDbList);
-        if (updatedApiList.equals(updatedDbList)) {
-            logger.info("Assertion Passed number of records in API column is: " + apiList.size() + " number of records in DB is: " + dbList.size());
-        }
-        if (!updatedApiList.equals(updatedDbList)) {
-            logger.info("Assertion Failed API data is not matching with DB data \nAPI DATA: \n" + apiList + "\nDB data: \n" + dbList + "\n number of records in API column is: " + apiList.size() + " number of records in DB is: " + dbList.size());
-        }
-        Assertions.assertTrue(updatedApiList.equals(updatedDbList));
+        softAssert.assertEquals(updatedApiList, updatedDbList, "Integer list mismatch");
     }
 
     public static void softAssertTrueOneByOneWithContainsMethod(List apiList, List dbList) {
-        apiList.removeIf(item -> item == null);
-        apiList.removeIf(item -> item == "null");
-        dbList.removeIf(item -> item == null);
-        dbList.removeIf(item -> item == "null");
+        apiList.removeIf(item -> item == null || "null".equals(item));
+        dbList.removeIf(item -> item == null || "null".equals(item));
         Collections.sort(apiList);
         Collections.sort(dbList);
-        Boolean flag = Boolean.FALSE;
         for (int i = 0; i < apiList.size(); i++) {
-            if (dbList.get(i).toString().contains(apiList.get(i).toString())) {
-                flag = Boolean.TRUE;
-            } else {
-                logger.info("Assertion Failed API value is: " + apiList.get(i) + " not matching with DB value: " + dbList.get(i) +
-                        "\n total record in api list: " + apiList.size() + " total record in db list" + dbList.size());
-                flag = Boolean.FALSE;
-            }
-        }
-        if (flag = Boolean.TRUE) {
-            logger.info("Assertion Passed");
-        }
-
-        for (int i = 0; i < apiList.size(); i++) {
-            Assertions.assertTrue(dbList.get(i).toString().contains(apiList.get(i).toString()));
+            softAssert.assertTrue(dbList.get(i).toString().contains(apiList.get(i).toString()),
+                    "Mismatch at index " + i);
         }
     }
 
@@ -164,105 +108,57 @@ public class AssertHelpers {
     }
 
     public static void compareColumnNameAndDataTypeListElementWise(List<String> postgresList, List<String> trinoList) {
-        SoftAssertions softAssert = new SoftAssertions();
+        SoftAssert localSoftAssert = new SoftAssert();
+        List<String> convertedOracleList = convertOracleToTrino(postgresList);
 
-        // Convert PostgreSQL output to Trino format
-        List<String> convertedPostgresList = convertPostgresToTrino(postgresList);
-
-        // Ensure lists have the same size before comparison
-        if (convertedPostgresList.size() != trinoList.size()) {
-            logger.error("❌ Lists are of different sizes! PostgreSQL: " + convertedPostgresList.size() + " Trino: " + trinoList.size());
-            softAssert.fail("List sizes do not match! PostgreSQL: " + convertedPostgresList.size() + " Trino: " + trinoList.size());
+        if (convertedOracleList.size() != trinoList.size()) {
+            logger.error("❌ Lists are of different sizes! Oracle: " + convertedOracleList.size() + " Trino: " + trinoList.size());
+            localSoftAssert.fail("List sizes do not match!");
         }
-
-        // Element-wise comparison
-        for (int i = 0; i < convertedPostgresList.size(); i++) {
-            String expected = convertedPostgresList.get(i);
+        //Comparing the column name and its data type
+        for (int i = 0; i < convertedOracleList.size(); i++) {
+            String expected = convertedOracleList.get(i);
             String actual = trinoList.get(i);
-
-            softAssert.assertThat(actual)
-                    .as("Mismatch at index " + i)
-                    .isEqualTo(expected);
-
-            if (expected.equals(actual)) {
-                logger.info(expected + " ✅ MATCHED");
-            } else {
-                logger.info(expected + " ❌ NOT MATCHED");
-            }
+            localSoftAssert.assertEquals(actual, expected, "Mismatch at index " + i);
         }
-
-        // Run all assertions at the end
-        softAssert.assertAll();
+        localSoftAssert.assertAll();
     }
 
     public static void assertTrue(int list1, int list2) {
-        Assertions.assertEquals(list1, list2,
-                "Failed as PostgreSQL value is: " + list1 + " while Trino value is: " + list2);
+        Assert.assertEquals(list1, list2, "Mismatch between values: " + list1 + " and " + list2);
     }
 
     public static void assertTrue(int value) {
-        Assertions.assertTrue(value == 0, "Having duplicate rows and count is: " + value);
+        Assert.assertEquals(value, 0, "Having duplicate rows and count is: " + value);
     }
 
     public static void assertTrueSoft(int value) {
-        softAssert.assertThat(value)
-                .as("Checking duplicate rows count")
-                .isEqualTo(0);
-        if (value == 0) {
-            logger.info("ASSERTION PASSED");
-        } else {
-            logger.info("ASSERTION FAILED::" + " Looking for 0 while got " + value);
-        }
+        softAssert.assertEquals(value, 0, "Duplicate rows found: " + value);
     }
 
     public static void validateNumberOfRecords(int list1, int list2) {
-        softAssert.assertThat(list1)
-                .as("Failed as PostgreSQL value is: " + list1 + " while Trino value is: " + list2)
-                .isEqualTo(list2);
-        if (list1 == list2) {
-            logger.info("ASSERTION PASSED");
-        } else {
-            logger.info("ASSERTION FAILED::" + " PostgreSQL is having " + list1 + " records while Trino is having " + list2 + " records");
-        }
-
+        softAssert.assertEquals(list1, list2, "Mismatch in number of records");
     }
 
     public static void assertTrueCompareListElementWiseSoftAssertion(ArrayList<Object> oracleList, ArrayList<Object> trinoList) {
-        SoftAssertions softAssert = new SoftAssertions();
+        SoftAssert localSoftAssert = new SoftAssert();
 
-        // ✅ Check if list sizes match
         if (oracleList.size() != trinoList.size()) {
-            logger.error("❌ Lists are of different sizes! Oracle List Size: {}, Trino List Size: {}", oracleList.size(), trinoList.size());
-            softAssert.fail("Lists are of different sizes! Oracle Size: " + oracleList.size() + ", Trino Size: " + trinoList.size());
+            localSoftAssert.fail("List size mismatch: Oracle=" + oracleList.size() + ", Trino=" + trinoList.size());
         }
 
-        // ✅ Compare list elements
         for (int i = 0; i < oracleList.size(); i++) {
-            String oracleValue = getStringValue(oracleList.get(i));  // Convert any type to String
-            String trinoValue = getStringValue(trinoList.get(i));    // Convert any type to String
-
-            // ✅ Perform assertion with logging
-            softAssert.assertThat(oracleValue)
-                    .as("❌ Mismatch at index " + i + ". Expected: " + oracleValue + ", Found: " + trinoValue)
-                    .isEqualTo(trinoValue);
-
-            if (oracleValue.equals(trinoValue)) {
-                logger.info("✅ PASS: Element {} matches: {}", i, oracleValue);
-            } else {
-                logger.error("❌ FAIL: Element {} mismatch. Expected: {}, Found: {}", i, oracleValue, trinoValue);
-            }
+            String oracleValue = getStringValue(oracleList.get(i));
+            String trinoValue = getStringValue(trinoList.get(i));
+            localSoftAssert.assertEquals(trinoValue, oracleValue, "Mismatch at index " + i);
         }
-        // ✅ Final assertion check
-        softAssert.assertAll();
+
+        localSoftAssert.assertAll();
     }
 
     private static String getStringValue(Object obj) {
-        if (obj == null) {
-            return "null";  // Handle null values safely
-        } else if (obj instanceof List) {
-            return ((List<?>) obj).toString();  // Convert nested lists to string
-        } else {
-            return obj.toString();  // Convert other objects to string
-        }
+        if (obj == null) return "null";
+        if (obj instanceof List) return ((List<?>) obj).toString();
+        return obj.toString();
     }
 }

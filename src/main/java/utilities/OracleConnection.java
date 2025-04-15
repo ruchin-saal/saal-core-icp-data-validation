@@ -11,7 +11,7 @@ import java.util.List;
 public class OracleConnection {
     private static final Logger logger = LogManager.getLogger(OracleConnection.class);
 
-    private static String POSTGRESQL_URL;
+    private static String ORACLE_URL;
     private static Connection conn = null;
     private Statement stmt = null;
     private ResultSet rs = null;
@@ -22,7 +22,7 @@ public class OracleConnection {
 
     public static void printConfigs() {
         logger.info("=======================================================");
-        logger.info("=========[ Oracle Host Name ] : " + Config.postgresqlHost);
+        logger.info("=========[ Oracle Host Name ] : " + Config.oracleHost);
         logger.info("=========[ Oracle Port Number ] : " + Config.port);
         logger.info("=========[ Oracle Database ] : " + Config.database);
         logger.info("=========[ Oracle Username ] : " + Config.dbUsername);
@@ -30,20 +30,20 @@ public class OracleConnection {
     }
 
     /**
-     * Establishes a connection to PostgreSQL.
+     * Establishes a connection to Oracle.
      *
      * @return
      */
     public static Connection connect() throws Exception {
         Config.setConfigs();
 //        jdbc:oracle:thin:@//192.168.171.119:1522/PDB1
-        POSTGRESQL_URL = "jdbc:oracle:thin:@//" + Config.postgresqlHost + ":" + Config.port + "/" + Config.database;
+        ORACLE_URL = "jdbc:oracle:thin:@//" + Config.oracleHost + ":" + Config.port + "/" + Config.database;
 
         try {
-            // Load PostgreSQL JDBC Driver
+            // Load Oracle JDBC Driver
             Class.forName("org.postgresql.Driver");
             // Establish connection
-            conn = DriverManager.getConnection(POSTGRESQL_URL, Config.dbUsername, Config.dbPassword);
+            conn = DriverManager.getConnection(ORACLE_URL, Config.dbUsername, Config.dbPassword);
 //            logger.info("✅ Oracle Connection established successfully!");
         } catch (Exception e) {
             System.err.println("❌ Error connecting to database: " + e.getMessage());
@@ -82,16 +82,16 @@ public class OracleConnection {
             if (rs != null) rs.close();
             if (stmt != null) stmt.close();
             if (conn != null) conn.close();
-//            logger.info("✅ POSTGRESQL Connection closed successfully");
+//            logger.info("✅ ORACLE Connection closed successfully");
         } catch (SQLException e) {
             logger.info("❌ Error closing connection: " + e.getMessage());
         }
     }
 
-    public List<String> fetchColumnNamesAndDataType(String postgreSQLTableDetails) {
+    public List<String> fetchColumnNamesAndDataType(String oracleSQLTableDetails) {
         List<String> queryResult = new ArrayList<>();
-        String schemaName = (String) GenericFun.getTableDetails(postgreSQLTableDetails, "schema");
-        String tableName = (String) GenericFun.getTableDetails(postgreSQLTableDetails, "table");
+        String schemaName = (String) GenericFun.getTableDetails(oracleSQLTableDetails, "schema");
+        String tableName = (String) GenericFun.getTableDetails(oracleSQLTableDetails, "table");
         // Updated SQL query for Oracle
         String sql = "SELECT column_name, data_type FROM all_tab_columns " +
                 "WHERE owner = '" + schemaName.toUpperCase() + "' AND table_name = '" + tableName.toUpperCase() + "' ORDER BY column_name";
